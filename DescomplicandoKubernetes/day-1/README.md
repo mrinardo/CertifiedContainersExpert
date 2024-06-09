@@ -87,9 +87,9 @@ Abaixo temos as páginas oficiais das certificações do Kubernetes (CKA, CKAD e
 
 Antes de começar a falar um pouco mais sobre o Kubernetes, nós primeiro precisamos entender alguns componentes que são importantes no ecossistema do Kubernetes, um desses componentes é o Container Engine. 
 
-O *Container Engine* é o responsável por gerenciar as imagens e volumes, é ele o responsável por garantir que os os recursos que os containers estão utilizando está devidamente isolados, a vida do container, storage, rede, etc.
+O *Container Engine* é o responsável por gerenciar as imagens e volumes, é ele o responsável por garantir que os recursos que os containers estão utilizando estão devidamente isolados, a vida do container, storage, rede, etc.
 
-Hoje temos diversas opções para se utilizar como *Container Engine*, que até pouco tempo atrás tinhamos somente o Docker para esse papel.
+Hoje temos diversas opções para se utilizar como *Container Engine*, que até pouco tempo atrás tínhamos somente o Docker para esse papel.
 
 Opções como o Docker, o CRI-O e o Podman são bem conhecidas e preparadas para o ambiente produtivo. O Docker, como todos sabem, é o Container Engine mais popular e ele utiliza como Container Runtime o containerd.
 
@@ -100,7 +100,7 @@ Calma que vou te explicar já já, mas antes temos que falar sobre a OCI. :)
 &nbsp;
 #### OCI - Open Container Initiative
 
-A OCI é uma organização sem fins lucrativos que tem como objetivo padronizar a criação de containers, para que possam ser executados em qualquer ambiente. A OCI foi fundada em 2015 pela Docker, CoreOS, Google, IBM, Microsoft, Red Hat e VMware e hoje faz parte da Linux Foundation.
+A OCI é uma organização sem fins lucrativos que tem como objetivo padronizar a criação de containers para que possam ser executados em qualquer ambiente. A OCI foi fundada em 2015 pela Docker, CoreOS, Google, IBM, Microsoft, Red Hat e VMware e hoje faz parte da Linux Foundation.
 
 O principal projeto criado pela OCI é o *runc*, que é o principal container runtime de baixo nível, e utilizado por diferentes *Container Engines, como o Docker. 
 O *runc* é um projeto open source, escrito em Go e seu código está disponível no GitHub.
@@ -174,11 +174,11 @@ Alguns exemplos são:
 
 * **etcd**: O etcd é um *datastore* chave-valor distribuído que o k8s utiliza para armazenar as especificações, status e configurações do *cluster*. Todos os dados armazenados dentro do etcd são manipulados apenas através da API. Por questões de segurança, o etcd é por padrão executado apenas em nós classificados como *control plane* no *cluster* k8s, mas também podem ser executados em *clusters* externos, específicos para o etcd, por exemplo;
 
-* **Scheduler**: O *scheduler* é responsável por selecionar o nó que irá hospedar um determinado *pod* (a menor unidade de um *cluster* k8s - não se preocupe sobre isso por enquanto, nós falaremos mais sobre isso mais tarde) para ser executado. Esta seleção é feita baseando-se na quantidade de recursos disponíveis em cada nó, como também no estado de cada um dos nós do *cluster*, garantindo assim que os recursos sejam bem distribuídos. Além disso, a seleção dos nós, na qual um ou mais pods serão executados, também pode levar em consideração políticas definidas pelo usuário, tais como afinidade, localização dos dados a serem lidos pelas aplicações, etc;
+* **Scheduler**: O *scheduler* é responsável por selecionar o nó que irá hospedar um determinado *pod* para ser executado (*pod* é a menor unidade de um *cluster* k8s - não se preocupe sobre isso por enquanto, nós falaremos mais sobre isso mais tarde). Esta seleção é feita baseando-se na quantidade de recursos disponíveis em cada nó, como também no estado de cada um dos nós do *cluster*, garantindo assim que os recursos sejam bem distribuídos. Além disso, a seleção dos nós, na qual um ou mais pods serão executados, também pode levar em consideração políticas definidas pelo usuário, tais como afinidade, localização dos dados a serem lidos pelas aplicações, etc;
 
 * **Controller Manager**: É o *controller manager* quem garante que o *cluster* esteja no último estado definido no etcd. Por exemplo: se no etcd um *deploy* está configurado para possuir dez réplicas de um *pod*, é o *controller manager* quem irá verificar se o estado atual do *cluster* corresponde a este estado e, em caso negativo, procurará conciliar ambos;
 
-* **Kubelet**: O *kubelet* pode ser visto como o alente do k8s que é executado nos nós workers. Em cada nó worker deverá existir um agente Kubelet em execução. O Kubelet é responsável por de fato gerenciar os *pods* que foram direcionados pelo *controller* do *cluster*, dentro dos nós, de forma que para isto o Kubelet pode iniciar, parar e manter os contêineres e os pods em funcionamento de acordo com o instruído pelo controlador do cluster;
+* **Kubelet**: O *kubelet* pode ser visto como o agente do k8s que é executado nos nós workers. Em cada nó worker deverá existir um agente Kubelet em execução. O Kubelet é responsável por de fato gerenciar os *pods* que foram direcionados pelo *controller* do *cluster*, dentro dos nós, de forma que para isto o Kubelet pode iniciar, parar e manter os contêineres e os pods em funcionamento de acordo com o instruído pelo controlador do cluster;
 
 * **Kube-proxy**: Age como um *proxy* e um *load balancer*. Este componente é responsável por efetuar roteamento de requisições para os *pods* corretos, como também por cuidar da parte de rede do nó;
 
@@ -211,7 +211,7 @@ TCP|Inbound|30000-32767|NodePort|Services All
 
 É importante saber que a forma como o k8s gerencia os contêineres é ligeiramente diferente de outros orquestradores, como o Docker Swarm, sobretudo devido ao fato de que ele não trata os contêineres diretamente, mas sim através de *pods*. Vamos conhecer alguns dos principais conceitos que envolvem o k8s a seguir:
 
-- **Pod**: É o menor objeto do k8s. Como dito anteriormente, o k8s não trabalha com os contêineres diretamente, mas organiza-os dentro de *pods*, que são abstrações que dividem os mesmos recursos, como endereços, volumes, ciclos de CPU e memória. Um pod pode possuir vários contêineres;
+- **Pod**: É o menor objeto do k8s. Como dito anteriormente, o k8s não trabalha com os contêineres diretamente, mas os organiza dentro de *pods*, que são abstrações que dividem os mesmos recursos, como endereços, volumes, ciclos de CPU e memória. Um pod pode possuir vários contêineres;
 
 - **Deployment**: É um dos principais *controllers* utilizados. O *Deployment*, em conjunto com o *ReplicaSet*, garante que determinado número de réplicas de um pod esteja em execução nos nós workers do cluster. Além disso, o Deployment também é responsável por gerenciar o ciclo de vida das aplicações, onde características associadas a aplicação, tais como imagem, porta, volumes e variáveis de ambiente, podem ser especificados em arquivos do tipo *yaml* ou *json* para posteriormente serem passados como parâmetro para o ``kubectl`` executar o deployment. Esta ação pode ser executada tanto para criação quanto para atualização e remoção do deployment;
 
@@ -768,7 +768,7 @@ pod "nginx" deleted
 ##### Executando nosso primeiro pod no k8s
 
 
-Uma outra forma de criar um pod ou qualquer outro objeto no Kubernetes é através da utilizaçâo de uma arquivo manifesto, que é uma arquivo em formato YAML onde você passa todas as definições do seu objeto. Mas pra frente vamos falar muito mais sobre como construir arquivos manifesto, mas agora eu quero que você conheça a opção ``--dry-run`` do ``kubectl``, pos com ele podemos simular a criação de um resource e ainda ter um manifesto criado automaticamente. 
+Uma outra forma de criar um pod ou qualquer outro objeto no Kubernetes é através da utilizaçâo de uma arquivo manifesto, que é uma arquivo em formato YAML onde você passa todas as definições do seu objeto. Mas pra frente vamos falar muito mais sobre como construir arquivos manifesto, mas agora eu quero que você conheça a opção ``--dry-run`` do ``kubectl``, pois com ela podemos simular a criação de um resource e ainda ter um manifesto criado automaticamente. 
 
 Exemplos:
 
@@ -778,7 +778,7 @@ Para a criação do template de um *pod*:
 kubectl run meu-nginx --image nginx --dry-run=client -o yaml > pod-template.yaml
 ```
 &nbsp;
-Aqui estamos utilizando ainda o parametro '-o', utilizando para modificar a saída para o formato YAML.
+Aqui estamos utilizando ainda o parametro '-o', utilizado para modificar a saída para o formato YAML.
 
 Para a criação do *template* de um *deployment*:
 
@@ -847,13 +847,13 @@ kubernetes   ClusterIP   10.96.0.1       <none>        443/TCP   8d
 nginx        ClusterIP   10.105.41.192   <none>        80/TCP    2m30s
 ```
 
-Como é possível observar, há dois *services* no nosso *cluster*: o primeiro é para uso do próprio k8s, enquanto o segundo foi o quê acabamos de criar. 
+Como é possível observar, há dois *services* no nosso *cluster*: o primeiro é para uso do próprio k8s, enquanto o segundo foi o que acabamos de criar. 
 
 &nbsp;
 
 #### Limpando tudo e indo para casa
 
-Para mostrar todos os recursos recém criados, pode-se utilizar uma das seguintes opções a seguir.
+Para mostrar todos os recursos recém-criados, pode-se utilizar uma das seguintes opções:
 
 ```
 kubectl get all
