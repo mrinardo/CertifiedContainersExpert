@@ -1544,7 +1544,7 @@ kubectl apply -f nginx-startup.yaml
 
 Quando você tentar aplicar, receberá um erro, pois a `successThreshold` não pode ser maior que 1, pois a `startupProbe` é executada apenas uma vez, lembra?
 
-Da mesma forma o `failureThreshold` não pode ser maior que 1, então vamos alterar o nosso arquivo para:
+Dessa forma, vamos então alterar o nosso arquivo para:
 
 ```yaml
 ...
@@ -1556,7 +1556,7 @@ Da mesma forma o `failureThreshold` não pode ser maior que 1, então vamos alte
           periodSeconds: 10 # De quanto em quanto tempo iremos executar a probe
           timeoutSeconds: 5 # O tempo que iremos esperar para considerar que a probe falhou
           successThreshold: 1 # O número de vezes que a probe precisa passar para considerar que o container está pronto
-          failureThreshold: 1 # O número de vezes que a probe precisa falhar para considerar que o container não está pronto
+          failureThreshold: 3 # O número de vezes que a probe precisa falhar para considerar que o container não está pronto
 ```
 
 &nbsp;
