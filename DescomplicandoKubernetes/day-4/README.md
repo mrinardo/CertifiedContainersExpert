@@ -715,44 +715,6 @@ Events:
 
 Na saída acima, podemos ver algumas informações bem importantes relacionadas ao `DaemonSet`, como por exemplo, o número de nós que o `DaemonSet` está gerenciando, o número de `Pods` que estão sendo executados em cada nó, etc.
 
-#### Criando um DaemonSet utilizando o comando kubectl create
-
-Você ainda pode criar um `DaemonSet` utilizando o comando `kubectl create`, mas eu prefiro utilizar o arquivo de manifesto, pois assim eu consigo versionar o meu `DaemonSet`, mas caso você queira criar um `DaemonSet` utilizando o comando `kubectl create`, basta executar o comando abaixo.
-
-```bash
-kubectl create daemonset node-exporter --image=prom/node-exporter:latest --port=9100 --host-port=9100
-```
-
-&nbsp;
-
-Ficaram faltando alguns parâmetros no comando acima, mas eu deixei assim para facilitar o entendimento, caso você queira ver todos os parâmetros que podem ser utilizados no comando `kubectl create daemonset`, basta executar o comando abaixo.
-
-```bash
-kubectl create daemonset --help
-```
-
-&nbsp;
-
-Eu gosto de utilizar o `kubectl create` somente para criar um arquivo exemplo, para que eu possa me basear na hora de criar o meu arquivo de manifesto, mas caso você queira criar um manifesto para criar `DaemonSet` utilizando o comando `kubectl create`, basta executar o comando abaixo.
-
-```bash
-kubectl create daemonset node-exporter --image=prom/node-exporter:latest --port=9100 --host-port=9100 -o yaml --dry-run=client > node-exporter-daemonset.yaml
-```
-
-&nbsp;
-
-Simples assim! Vou te explicar o que está acontecendo no comando acima.
-
-- `kubectl create daemonset node-exporter` - Cria um `DaemonSet` chamado `node-exporter`.
-- `--image=prom/node-exporter:latest` - Utiliza a imagem `prom/node-exporter:latest` para criar os `Pods`.
-- `--port=9100` - Define a porta `9100` para o `Pod`.
-- `--host-port=9100` - Define a porta `9100` para o nó.
-- `-o yaml` - Define o formato do arquivo de manifesto como `yaml`.
-- `--dry-run=client` - Executa o comando sem criar o `DaemonSet`, somente simula a criação do `DaemonSet`.
-- `> node-exporter-daemonset.yaml` - Redireciona a saída do comando para o arquivo `node-exporter-daemonset.yaml`.
-
-Ficou mais simples, certo?
-
 #### Aumentando um node no cluster
 
 Agora que já sabemos como criar um `DaemonSet`, vamos aumentar o número de nós do nosso cluster.
@@ -892,7 +854,7 @@ Acho que o assunto `DaemonSet` já está bem claro. Ainda iremos ver todos esses
 ### As Probes do Kubernetes
 
 Antes de seguir, eu queria trazer algo novo além dos dois novos objetos que você já aprendeu no dia de hoje.
-Eu queria que você saisse do dia de hoje com a segurança que você e capaz de criar um `Pod`, um `Deployment`, um `ReplicaSet` ou um `DaemonSet`, mas também com a segurança que você pode monitorar o seus suas aplicações que estão rodando dentro do cluster de maneira efetiva e utilizando recursos que o Kubernetes já nos disponibiliza.
+Eu queria que você saisse do dia de hoje com a segurança que você e capaz de criar um `Pod`, um `Deployment`, um `ReplicaSet` ou um `DaemonSet`, mas também com a segurança que você pode monitorar suas aplicações que estão rodando dentro do cluster de maneira efetiva e utilizando recursos que o Kubernetes já nos disponibiliza.
 
 #### O que são as Probes?
 
@@ -951,7 +913,7 @@ spec:
 
 Com isso temos algumas coisas novas, e utilizamos apenas uma `probe` que é a `livenessProbe`. 
 
-O que declaramos com a regra acima é que queremos testar se o `Pod` está respondendo através do protocolo TCP, através da opção `tcpSocket`, na porta 80 que foi definida pela opção `port`. E também definimos que queremos esperar 10 segundos para executar a primeira verificação utilizando `initialDelaySeconds` e por conta da `periodSeconds`falamos que queremos que a cada 10 segundos seja realizada a verificação. Caso a verificação falhe, vamos esperar 5 segundos, por conta da `timeoutSeconds`, para tentar novamente, e como utilizamos o `failureThreshold`, se falhar mais 3 vezes, vamos reiniciar o `Pod`.
+O que declaramos com a regra acima é que queremos testar se o `Pod` está respondendo através do protocolo TCP, através da opção `tcpSocket`, na porta 80 que foi definida pela opção `port`. Também definimos que queremos esperar 10 segundos para executar a primeira verificação utilizando `initialDelaySeconds` e por conta da `periodSeconds`  falamos que queremos que a cada 10 segundos seja realizada a verificação. A opção `timeoutSeconds` determina que a verificação deve ser respondida em até 5s, caso contrário será considerada uma falha. Caso a verificação falhe, será feita uma nova verificação e, como utilizamos o `failureThreshold`, se falhar mais 3 vezes, vamos reiniciar o `Pod`.
       
 Ficou mais claro? Vamos para mais um exemplo.
 
@@ -1013,10 +975,10 @@ kubectl apply -f nginx-deployment.yaml
 
 &nbsp;
 
-Para verificar se o `Deployment` foi criado corretamente, execute o comando abaixo.
+Para verificar se os `Pods` do `Deployment` foram criados corretamente, execute o comando abaixo.
 
 ```bash
-kubectl get deployments
+kubectl get pods
 ```
 
 &nbsp;
@@ -1266,17 +1228,17 @@ Acho que agora ficou bem mais claro como a `livenessProbe` funciona, então é h
 
 A `readinessProbe` é uma forma de o Kubernetes verificar se o seu container está pronto para receber tráfego, se ele está pronto para receber requisições vindas de fora.
 
-Essa é a nossa probe de leitura, ela fica verificando se o nosso container está pronto para receber requisições, e se estiver pronto, ele irá receber requisições, caso contrário, ele não irá receber requisições, pois será removido do `endpoint` do serviço, fazendo com que o tráfego não chegue até ele.
+Essa é a nossa probe de leitura, ela fica verificando se o nosso container está pronto para receber requisições e, se estiver pronto, ele irá receber requisições, caso contrário, ele não irá receber requisições, pois será removido do `endpoint` do serviço, fazendo com que o tráfego não chegue até ele.
 
-Ainda iremos ver o que é `service` e `endpoint`, mas por enquanto, basta saber que o `endpoint` é o endereço que o nosso `service` irá usar para acessar o nosso `Pod`. Mas vamos ter um dia inteiro para falar sobre `service` e `endpoint`, então, relaxa.
+Ainda iremos ver o que é `service` e `endpoint`, mas por enquanto basta saber que o `endpoint` é o endereço que o nosso `service` irá usar para acessar o nosso `Pod`. Mas vamos ter um dia inteiro para falar sobre `service` e `endpoint`, então, relaxa.
 
 &nbsp;
 
-Voltando ao assunto, a nossa probe da vez irá garantir que o nosso `Pod`está saudável para receber requisições.
+Voltando ao assunto, a nossa probe da vez irá garantir que o nosso `Pod` está saudável para receber requisições.
 
 Vamos para um exemplo para ficar mais claro.
 
-Para o nosso exemplo, vamos criar um arquivo chamado `nginx-readiness.yaml` e vamos colocar o seguinte conteúdo:
+Para o nosso exemplo, vamos criar um arquivo chamado `nginx-readiness.yaml` e colocar o seguinte conteúdo:
 
 ```yaml
 apiVersion: apps/v1
@@ -1336,9 +1298,9 @@ nginx-deployment-fbdc9b65f-zn8zh   0/1     Running   0          6s
 
 &nbsp;
 
-Podemos ver que agora os `Pods` demoram um pouco mais para ficarem prontos, pois estamos executando a nossa `readinessProbe`, e por esse motivo temos que aguardar os 10 segundos inicias que definimos para que seja executada a primeira vez a nossa probe, lembra?
+Podemos ver que agora os `Pods` demoram um pouco mais para ficarem prontos, pois estamos executando a nossa `readinessProbe`, e por esse motivo temos que aguardar os 10 segundos iniciais que definimos para que seja executada pela primeira vez a nossa probe, lembra?
 
-Se você aguardar um pouco, você verá que os `Pods` irão ficar prontos, e você pode ver isso executando o comando:
+Se você aguardar um pouco, você verá que os `Pods` irão ficar prontos e você pode ver isso executando o comando:
 
 ```bash
 kubectl get pods
@@ -1593,8 +1555,8 @@ Da mesma forma o `failureThreshold` não pode ser maior que 1, então vamos alte
           initialDelaySeconds: 10 # O tempo que iremos esperar para executar a primeira vez a probe
           periodSeconds: 10 # De quanto em quanto tempo iremos executar a probe
           timeoutSeconds: 5 # O tempo que iremos esperar para considerar que a probe falhou
-          successThreshold: 2 # O número de vezes que a probe precisa passar para considerar que o container está pronto
-          failureThreshold: 3 # O número de vezes que a probe precisa falhar para considerar que o container não está pronto
+          successThreshold: 1 # O número de vezes que a probe precisa passar para considerar que o container está pronto
+          failureThreshold: 1 # O número de vezes que a probe precisa falhar para considerar que o container não está pronto
 ```
 
 &nbsp;
@@ -1699,7 +1661,7 @@ spec:
           periodSeconds: 10 # De quanto em quanto tempo iremos executar a probe
           timeoutSeconds: 5 # O tempo que iremos esperar para considerar que a probe falhou
           successThreshold: 1 # O número de vezes que a probe precisa passar para considerar que o container está pronto
-          failureThreshold: 3 # O número de vezes que a probe precisa falhar para considerar que o container não está pronto
+          failureThreshold: 1 # O número de vezes que a probe precisa falhar para considerar que o container não está pronto
 ```
 
 &nbsp;
@@ -1715,12 +1677,12 @@ kubectl apply -f nginx-todas-probes.yaml
 E vamos ver se os nossos `Pods` estão saudáveis:
 
 ```bash
-
+kubectl describe pod nginx-deployment-6fbd5f9794-66sww
 ```
 
 &nbsp;
 
-Vamos ver na saída do `describe pods` se as nossa probes estão por lá.
+Vamos ver na saída do `describe pod` se as nossa probes estão por lá.
 
 ```bash
 ...
